@@ -15,17 +15,17 @@
     <link rel="canonical" href="https://grupoturing.com/">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="https://grupoturing.com/favicon.png">
-    <link rel="shortcut icon" type="image/png" href="https://grupoturing.com/favicon.png">
-    <link rel="apple-touch-icon" href="https://grupoturing.com/favicon.png">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
     
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://grupoturing.com/">
     <meta property="og:title" content="Grupo Turing - Automatización de Procesos Empresariales Ecuador | Ahorra 80% de Tiempo">
     <meta property="og:description" content="Transformamos procesos manuales en sistemas automatizados en Ecuador. Eliminamos tareas repetitivas y optimizamos flujos de trabajo. 80% menos tiempo, ROI en 6 meses. +250 procesos automatizados.">
-    <meta property="og:image" content="https://grupoturing.com/LogoEmpresa.jpg">
-    <meta property="og:image:secure_url" content="https://grupoturing.com/LogoEmpresa.jpg">
+    <meta property="og:image" content="LogoEmpresa.jpg">
+    <meta property="og:image:secure_url" content="LogoEmpresa.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Grupo Turing - Automatización Empresarial e Ingeniería de Datos Ecuador">
@@ -37,7 +37,7 @@
     <meta name="twitter:url" content="https://grupoturing.com/">
     <meta name="twitter:title" content="Grupo Turing - Automatización de Procesos Empresariales Ecuador">
     <meta name="twitter:description" content="Transformamos procesos manuales en sistemas automatizados en Ecuador. 80% menos tiempo en tareas repetitivas. ROI garantizado en 6 meses.">
-    <meta name="twitter:image" content="https://grupoturing.com/LogoEmpresa.jpg">
+    <meta name="twitter:image" content="LogoEmpresa.jpg">
     
     <!-- Additional SEO Meta Tags -->
     <meta name="author" content="Grupo Turing">
@@ -1082,6 +1082,34 @@
     <script>
         // Update copyright year automatically
         document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Update Open Graph and Twitter Card URLs dynamically
+        (function() {
+            const baseUrl = window.location.origin + window.location.pathname.replace(/\/$/, '');
+            
+            // Update Open Graph image URLs
+            const ogImage = document.querySelector('meta[property="og:image"]');
+            const ogImageSecure = document.querySelector('meta[property="og:image:secure_url"]');
+            const twitterImage = document.querySelector('meta[name="twitter:image"]');
+            const ogUrl = document.querySelector('meta[property="og:url"]');
+            const twitterUrl = document.querySelector('meta[name="twitter:url"]');
+            
+            if (ogImage && !ogImage.content.startsWith('http')) {
+                ogImage.content = baseUrl + '/' + ogImage.content;
+            }
+            if (ogImageSecure && !ogImageSecure.content.startsWith('http')) {
+                ogImageSecure.content = baseUrl + '/' + ogImageSecure.content;
+            }
+            if (twitterImage && !twitterImage.content.startsWith('http')) {
+                twitterImage.content = baseUrl + '/' + twitterImage.content;
+            }
+            if (ogUrl && ogUrl.content.includes('grupoturing.com') && !window.location.hostname.includes('grupoturing.com')) {
+                ogUrl.content = window.location.href;
+            }
+            if (twitterUrl && twitterUrl.content.includes('grupoturing.com') && !window.location.hostname.includes('grupoturing.com')) {
+                twitterUrl.content = window.location.href;
+            }
+        })();
         
         // Loading Screen Management
         window.addEventListener('load', function() {
