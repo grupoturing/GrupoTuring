@@ -426,6 +426,9 @@
         </svg>
     </a>
     
+    <!-- Hidden iframe for Google Forms submission -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="handleFormSubmitted()"></iframe>
+    
     <!-- Success Modal -->
     <div id="successModal" class="success-modal">
         <div class="success-modal-content">
@@ -1154,42 +1157,42 @@
 
                 <!-- Formulario -->
                 <div>
-                    <form action="https://formsubmit.co/contacto@grupoturing.com" method="POST" class="space-y-6" id="contactForm">
-                        <!-- FormSubmit Configuration -->
-                        <input type="hidden" name="_subject" value="Nueva Consulta desde Grupo Turing Website">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_next" value="https://grupoturing.com/#gracias">
+                    <form action="https://docs.google.com/forms/d/e/1FAIpQLSeeMGCz56O2Ss5V42hvG3M8FOH3Z6aSe_VtBL7OEYGUe3D4lw/formResponse" 
+                          method="POST" 
+                          target="hidden_iframe" 
+                          class="space-y-6" 
+                          id="contactForm"
+                          onsubmit="return handleGoogleFormSubmit()">
                         
                         <div>
                             <label for="nombre" class="block text-sm font-medium mb-2">Nombre Completo *</label>
-                            <input type="text" id="nombre" name="nombre" required
+                            <input type="text" id="nombre" name="entry.217518067" required
                                 class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
                                 placeholder="Carlos Mendoza">
                         </div>
                         <div>
                             <label for="email" class="block text-sm font-medium mb-2">Email Corporativo *</label>
-                            <input type="email" id="email" name="email" required
+                            <input type="email" id="email" name="entry.788643281" required
                                 class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
                                 placeholder="carlos.mendoza@empresa.com">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label for="empresa" class="block text-sm font-medium mb-2">Empresa *</label>
-                                <input type="text" id="empresa" name="empresa" required
+                                <input type="text" id="empresa" name="entry.1532038394" required
                                     class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
                                     placeholder="Mi Empresa S.A.">
                             </div>
                             <div>
                                 <label for="telefono" class="block text-sm font-medium mb-2">Teléfono</label>
-                                <input type="tel" id="telefono" name="telefono"
+                                <input type="tel" id="telefono" name="entry.500470787"
                                     class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300"
                                     placeholder="+593 98 765 4321">
                             </div>
                         </div>
                         <div>
                             <label for="servicio" class="block text-sm font-medium mb-2">Servicio de Interés</label>
-                            <select id="servicio" name="servicio"
+                            <select id="servicio" name="entry.1196513291"
                                 class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300">
                                 <option value="">Selecciona un servicio</option>
                                 <option value="Automatización de Procesos (RPA)">Automatización de Procesos (RPA)</option>
@@ -1203,7 +1206,7 @@
                         </div>
                         <div>
                             <label for="mensaje" class="block text-sm font-medium mb-2">Cuéntanos sobre tu proyecto *</label>
-                            <textarea id="mensaje" name="mensaje" rows="4" required
+                            <textarea id="mensaje" name="entry.691431687" rows="4" required
                                 class="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 resize-none"
                                 placeholder="Describe los procesos que quieres automatizar..."></textarea>
                         </div>
@@ -1319,14 +1322,25 @@
             }
         });
         
-        // Show success message when redirected back
-        if (window.location.hash === '#gracias') {
-            // Wait for page to fully load
-            setTimeout(() => {
+        // Google Forms submission handler
+        let formSubmitted = false;
+        
+        function handleGoogleFormSubmit() {
+            formSubmitted = true;
+            return true; // Allow form submission to proceed
+        }
+        
+        function handleFormSubmitted() {
+            if (formSubmitted) {
+                // Show success modal
                 showSuccessModal();
-            }, 500);
-            // Clean the hash from URL after showing modal
-            history.replaceState(null, null, window.location.pathname);
+                
+                // Reset form
+                document.getElementById('contactForm').reset();
+                
+                // Reset flag
+                formSubmitted = false;
+            }
         }
 
         // Intersection Observer for fade-in animations
