@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es-EC">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Digital - Grupo Turing | Soluciones para Cooperativas</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px 140px 20px;
+            overflow-x: hidden;
+        }
+
+        .catalog-container {
+            max-width: 1800px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Book container - simula un libro abierto */
+        .book-wrapper {
+            perspective: 3000px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            min-height: 85vh;
+        }
+
+        .book-spread {
+            display: flex;
+            gap: 3px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0s linear 0.5s;
+            position: absolute;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .book-spread.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease-in-out, visibility 0s linear 0s;
+            position: relative;
+        }
+
+        /* Páginas individuales */
+        .page {
+            width: 100%;
+            max-width: 650px;
+            min-height: 85vh;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            padding: 50px 45px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .page.left-page {
+            border-radius: 8px 0 0 8px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .page.right-page {
+            border-radius: 0 8px 8px 0;
+            border-left: 1px solid #e2e8f0;
+        }
+
+        .page.single-page {
+            border-radius: 12px;
+            border: none;
+            max-width: 800px;
+        }
+
+        /* Portada - siempre sola */
+        .portada {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px !important;
+        }
+
+        .portada::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(249, 115, 22, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+        }
+
+        .portada-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-container {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 45px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            display: inline-block;
+        }
+
+        .logo-container img {
+            max-width: 220px;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .portada h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 25px;
+            line-height: 1.2;
+        }
+
+        .portada p {
+            font-size: 19px;
+            margin-bottom: 35px;
+            max-width: 700px;
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .portada-footer {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 15px;
+            margin-top: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Contraportada */
+        .contraportada {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            border-radius: 12px !important;
+        }
+
+        .contraportada h2 {
+            font-size: 38px;
+            font-weight: 900;
+            margin-bottom: 25px;
+            line-height: 1.3;
+        }
+
+        .contraportada > p {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            background: white;
+            color: #f97316;
+            padding: 18px 45px;
+            border-radius: 35px;
+            font-weight: 700;
+            font-size: 19px;
+            display: inline-block;
+            margin: 20px auto;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+
+        .contact-info {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px 35px;
+            border-radius: 20px;
+            margin-top: 30px;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-info div {
+            padding: 8px 0;
+            font-size: 16px;
+        }
+
+        .contact-info strong {
+            font-weight: 700;
+        }
+
+        .contact-logo {
+            background: white;
+            display: inline-block;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .contact-logo img {
+            max-width: 120px;
+            height: auto;
+            border-radius: 6px;
+        }
+
+        /* Títulos y contenido */
+        .page-title {
+            font-size: 34px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 20px;
+            border-bottom: 5px solid #f97316;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .page-subtitle {
+            font-size: 17px;
+            font-weight: 600;
+            color: #f97316;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .page p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #334155;
+            margin-bottom: 20px;
+        }
+
+        .service-box {
+            background: #f8fafc;
+            border-left: 5px solid #f97316;
+            padding: 22px 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .service-box h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .service-box p {
+            font-size: 15px;
+            color: #475569;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .promise-box {
+            background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+            padding: 18px 22px;
+            border-radius: 12px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .promise-box h4 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #ea580c;
+            margin-bottom: 6px;
+        }
+
+        .promise-box p {
+            font-size: 14px;
+            color: #334155;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .methodology-step {
+            background: #f1f5f9;
+            padding: 18px 22px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            border-left: 5px solid #f97316;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .methodology-step h4 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .methodology-step p {
+            font-size: 14px;
+            color: #475569;
+            margin: 0;
+            line-height: 1.7;
+        }
+
+        .brand-logos {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .brand-logo {
+            background: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #64748b;
+            font-size: 13px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .icon-circle {
+            display: inline-block;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            padding: 30px;
+            border-radius: 50%;
+            box-shadow: 0 15px 40px rgba(249, 115, 22, 0.4);
+            margin: 25px 0;
+        }
+
+        .icon-circle.blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .icon-circle.green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .icon-circle svg {
+            width: 55px;
+            height: 55px;
+            color: white;
+        }
+
+        .highlight-box {
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .highlight-box p {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+            color: white;
+        }
+
+        .highlight-box span {
+            color: #f97316;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            border: 2px solid #3b82f6;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e40af;
+            margin: 0;
+        }
+
+        .warning-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef3c7;
+            border-radius: 10px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .warning-box p {
+            font-size: 13px;
+            color: #92400e;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Navegación */
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-btn {
+            background: #f97316;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #ea580c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(249, 115, 22, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-counter {
+            color: white;
+            font-weight: 600;
+            padding: 0 15px;
+            font-size: 16px;
+        }
+
+        .nav-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(249, 115, 22, 0.2);
+            border-top-color: #f97316;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .page {
+                max-width: 550px;
+                padding: 45px 40px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .book-spread {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .page {
+                max-width: 750px;
+                border-radius: 12px !important;
+                border: none !important;
+            }
+
+            .page.left-page,
+            .page.right-page {
+                border-radius: 12px !important;
+                border: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px 110px 15px;
+            }
+
+            .page {
+                padding: 40px 30px;
+                min-height: 80vh;
+            }
+
+            .portada h1 {
+                font-size: 30px;
+            }
+
+            .portada p {
+                font-size: 16px;
+            }
+
+            .page-title {
+                font-size: 26px;
+            }
+
+            .contraportada h2 {
+                font-size: 28px;
+            }
+
+            .navigation {
+                bottom: 15px;
+                padding: 12px 20px;
+            }
+
+            .nav-btn {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+
+            .logo-container img {
+                max-width: 160px;
+            }
+
+            .icon-circle {
+                padding: 25px;
+            }
+
+            .icon-circle svg {
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page {
+                padding: 30px 20px;
+            }
+
+            .page-title {
+                font-size: 22px;
+            }
+
+            .portada h1 {
+                font-size: 26px;
+            }
+
+            .service-box,
+            .promise-box,
+            .methodology-step {
+                padding: 16px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="catalog-container">
+        <div class="book-wrapper" id="bookWrapper">
+            <!-- Las páginas se generarán dinámicamente aquí -->
+        </div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="navigation">
+        <button id="prevBtn" class="nav-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Anterior
+        </button>
+        <span class="page-counter">
+            <span id="currentPage">1</span> / <span id="totalPages">7</span>
+        </span>
+        <button id="nextBtn" class="nav-btn">
+            Siguiente
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Definición de páginas -->
+    <template id="pages-template">
+        <!-- PÁGINA 1: PORTADA -->
+        <div class="page portada single-page" data-page="1">
+            <div class="portada-content">
+                <div class="logo-container">
+                    <img src="LogoEmpresa.jpg" alt="Grupo Turing Logo">
+                </div>
+                <h1>Tecnología que Blinda y<br>Potencia su Empresa</h1>
+                <p>Automatización de Procesos, Ingeniería de Datos e Infraestructura de Alto Nivel - Especializados en el Sector Financiero Popular y Solidario</p>
+                <div class="portada-footer">
+                    ✓ Soluciones diseñadas para cumplir con normativas regulatorias y exigencias del mercado actual
+                </div>
+            </div>
+        </div>
+
+        <!-- PÁGINA 2: QUIÉNES SOMOS -->
+        <div class="page" data-page="2">
+            <h2 class="page-title">Quiénes Somos</h2>
+            <p class="page-subtitle">Más que proveedores, somos sus aliados estratégicos</p>
+            
+            <p>En <strong>Grupo Turing</strong>, entendemos que la tecnología en instituciones financieras y empresas modernas no es un lujo, es una necesidad crítica. Con experiencia directa en la banca ecuatoriana y especializados en Cooperativas de Ahorro y Crédito, conocemos de primera mano los desafíos de integración, la presión regulatoria y la necesidad de eficiencia operativa.</p>
+
+            <h3 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 25px 0 15px 0;">Nuestra Promesa:</h3>
+
+            <div class="promise-box">
+                <h4>💡 Eficiencia</h4>
+                <p>Transformamos tareas manuales de horas en procesos automáticos de minutos.</p>
+            </div>
+
+            <div class="promise-box">
+                <h4>🔒 Seguridad</h4>
+                <p>Infraestructura robusta y manejo confidencial de la información.</p>
+            </div>
+
+            <div class="promise-box">
+                <h4>📈 Resultados</h4>
+                <p>Tecnología que genera Retorno de Inversión (ROI) medible.</p>
+            </div>
+
+            <div class="highlight-box">
+                <p>Experiencia directa en banca ecuatoriana<br>
+                <span>+10 años en el sector financiero</span><br>
+                <small style="font-size: 12px; opacity: 0.8; margin-top: 8px; display: block;">Especializados en Cooperativas | Abiertos a todo tipo de empresas</small></p>
+            </div>
+        </div>
+
+        <!-- PÁGINA 3: AUTOMATIZACIÓN -->
+        <div class="page" data-page="3">
+            <h2 class="page-title">Automatización Inteligente</h2>
+            <p class="page-subtitle">RPA & ETL - Elimine el error humano</p>
+            
+            <div style="text-align: center;">
+                <div class="icon-circle">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="service-box">
+                <h3>🤖 Robots de Software (RPA)</h3>
+                <p>Implementamos "trabajadores digitales" que operan 24/7 para realizar tareas repetitivas como conciliaciones bancarias, validación de buró de crédito, carga masiva de lotes y cruce de información entre portales web y su Core.</p>
+            </div>
+
+            <div class="service-box">
+                <h3>📊 Reportes Regulatorios</h3>
+                <p>¿Su área de Riesgos sufre cada fin de mes? Automatizamos la extracción, limpieza y estructuración de datos para generar los reportes exigidos por los organismos de control (Estructuras SEPS / SRI) en tiempo récord.</p>
+            </div>
+
+            <div class="service-box">
+                <h3>🔄 Migración de Datos Segura</h3>
+                <p>Scripts especializados para mover grandes volúmenes de información entre sistemas sin pérdida de datos ni inconsistencias.</p>
+            </div>
+        </div>
+
+        <!-- PÁGINA 4: INGENIERÍA DE DATOS -->
+        <div class="page" data-page="4">
+            <h2 class="page-title">Ingeniería de Datos</h2>
+            <p class="page-subtitle">Convierta sus datos en su activo más valioso</p>
+            
+            <div style="text-align: center;">
+                <div class="icon-circle blue">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="service-box">
+                <h3>🔍 Limpieza y Calidad de Datos</h3>
+                <p>Auditamos y saneamos su base de socios. Eliminamos duplicados, corregimos formatos erróneos y validamos información para garantizar campañas comerciales efectivas y cumplimiento normativo.</p>
+            </div>
+
+            <div class="service-box">
+                <h3>🔌 Integración de Sistemas</h3>
+                <p>Hacemos que sus sistemas conversen. Desarrollamos capas intermedias (Middleware) seguras para conectar su Core Bancario con aplicaciones móviles, webs transaccionales o proveedores externos (Tarjetas, Seguros).</p>
+            </div>
+
+            <div class="service-box">
+                <h3>💻 Desarrollo a Medida</h3>
+                <p>Creación de módulos específicos que su Core no cubre: Portales de socios, sistemas de gestión documental o herramientas de análisis de crédito personalizadas.</p>
+            </div>
+        </div>
+
+        <!-- PÁGINA 5: INFRAESTRUCTURA -->
+        <div class="page" data-page="5">
+            <h2 class="page-title">Infraestructura</h2>
+            <p class="page-subtitle">Hardware de clase mundial</p>
+            
+            <div style="text-align: center;">
+                <div class="icon-circle green">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="service-box">
+                <h3>🖥️ Servidores y Almacenamiento</h3>
+                <p>Provisión, instalación y configuración de Servidores (Rack/Tower) y Storage de alto rendimiento. Trabajamos con marcas líderes (Dell PowerEdge, HPE ProLiant) para asegurar velocidad y redundancia.</p>
+            </div>
+
+            <div class="service-box">
+                <h3>🔐 Networking y Seguridad</h3>
+                <p>Switches administrables, Routers y Firewalls de nueva generación (Cisco, Fortinet, Aruba) para blindar su red interna y garantizar conectividad estable en Matriz y Agencias.</p>
+            </div>
+
+            <div class="service-box">
+                <h3>📜 Licenciamiento de Software</h3>
+                <p>Gestión de licencias originales para Microsoft Windows Server, SQL Server y herramientas de ofimática. Evite multas por propiedad intelectual.</p>
+            </div>
+
+            <div class="brand-logos">
+                <div class="brand-logo">DELL</div>
+                <div class="brand-logo">HPE</div>
+                <div class="brand-logo">CISCO</div>
+                <div class="brand-logo">MICROSOFT</div>
+            </div>
+        </div>
+
+        <!-- PÁGINA 6: METODOLOGÍA -->
+        <div class="page" data-page="6">
+            <h2 class="page-title">¿Cómo Trabajamos?</h2>
+            <p class="page-subtitle">Metodología probada</p>
+            
+            <div class="methodology-step">
+                <h4>1️⃣ Diagnóstico (NDA)</h4>
+                <p>Firmamos un acuerdo de confidencialidad y analizamos su situación actual sin costo inicial.</p>
+            </div>
+
+            <div class="methodology-step">
+                <h4>2️⃣ Propuesta a Medida</h4>
+                <p>No vendemos "cajas", diseñamos la arquitectura tecnológica que su organización necesita.</p>
+            </div>
+
+            <div class="methodology-step">
+                <h4>3️⃣ Implementación Ágil</h4>
+                <p>Despliegues controlados, pruebas exhaustivas (QA) y puesta en producción sin afectar la operación diaria.</p>
+            </div>
+
+            <div class="methodology-step">
+                <h4>4️⃣ Soporte Post-Venta</h4>
+                <p>Garantía real sobre hardware y soporte técnico sobre nuestros desarrollos.</p>
+            </div>
+
+            <div class="info-box">
+                <p>✓ Metodología Ágil &nbsp;|&nbsp; ✓ QA Exhaustivo &nbsp;|&nbsp; ✓ Garantía Real</p>
+            </div>
+
+            <div class="warning-box">
+                <p><strong>💡 Compromiso:</strong> Trabajamos bajo acuerdos de confidencialidad (NDA) y garantizamos la seguridad de su información en todo momento.</p>
+            </div>
+        </div>
+
+        <!-- CONTRAPORTADA -->
+        <div class="page contraportada single-page" data-page="7">
+            <h2>El Futuro de su Empresa<br>Comienza con una Decisión Inteligente</h2>
+            
+            <p>No permita que los procesos manuales o la infraestructura obsoleta frenen su crecimiento. Permita que Grupo Turing optimice su operación hoy mismo.</p>
+
+            <div class="cta-button">
+                📞 Solicite un Diagnóstico Técnico Gratuito
+            </div>
+
+            <div class="contact-info">
+                <div><strong>📍 Oficinas:</strong> Quito, Ecuador</div>
+                <div style="font-size: 14px; opacity: 0.9;">(Cobertura Nacional)</div>
+                <div style="margin-top: 12px;"><strong>📧 Email:</strong> contacto@grupoturing.com</div>
+                <div><strong>🌐 Web:</strong> www.grupoturing.com</div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2);">
+                    <div class="contact-logo">
+                        <img src="LogoEmpresa.jpg" alt="Grupo Turing">
+                    </div>
+                </div>
+            </div>
+
+            <p style="font-size: 13px; margin-top: 25px; opacity: 0.8;">
+                ✓ Sin compromiso &nbsp;|&nbsp; ✓ Análisis personalizado &nbsp;|&nbsp; ✓ Respuesta en 24 horas
+            </p>
+        </div>
+    </template>
+
+    <script>
+        // Variables globales
+        let currentSpread = 0;
+        let totalSpreads = 0;
+        let pages = [];
+        let spreads = [];
+        let isDesktop = window.innerWidth > 1200;
+
+        // Inicializar el catálogo
+        function init() {
+            // Obtener todas las páginas del template
+            const template = document.getElementById('pages-template');
+            pages = Array.from(template.content.querySelectorAll('.page'));
+            
+            // Crear spreads (agrupaciones de páginas)
+            createSpreads();
+            
+            // Renderizar el primer spread
+            renderSpread(0);
+            
+            // Update navigation
+            updateNavigation();
+            
+            // Hide loading
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 500);
+        }
+
+        function createSpreads() {
+            const bookWrapper = document.getElementById('bookWrapper');
+            bookWrapper.innerHTML = '';
+            spreads = [];
+            isDesktop = window.innerWidth > 1200;
+
+            if (isDesktop) {
+                // En desktop: portada sola, pares de páginas, contraportada sola
+                // Spread 1: Portada (página 1)
+                spreads.push([pages[0].cloneNode(true)]);
+                
+                // Spreads 2-3: Páginas 2-3, 4-5
+                for (let i = 1; i < pages.length - 1; i += 2) {
+                    const leftPage = pages[i].cloneNode(true);
+                    const rightPage = pages[i + 1] ? pages[i + 1].cloneNode(true) : null;
+                    
+                    leftPage.classList.add('left-page');
+                    leftPage.classList.remove('single-page');
+                    
+                    if (rightPage) {
+                        rightPage.classList.add('right-page');
+                        rightPage.classList.remove('single-page');
+                        spreads.push([leftPage, rightPage]);
+                    } else {
+                        spreads.push([leftPage]);
+                    }
+                }
+                
+                // Última página (contraportada) sola si no está ya incluida
+                const lastPage = pages[pages.length - 1];
+                if (!spreads[spreads.length - 1].some(p => p.dataset.page === lastPage.dataset.page)) {
+                    spreads.push([lastPage.cloneNode(true)]);
+                }
+            } else {
+                // En móvil/tablet: una página por spread
+                pages.forEach(page => {
+                    const clonedPage = page.cloneNode(true);
+                    clonedPage.classList.add('single-page');
+                    clonedPage.classList.remove('left-page', 'right-page');
+                    spreads.push([clonedPage]);
+                });
+            }
+
+            totalSpreads = spreads.length;
+            document.getElementById('totalPages').textContent = pages.length;
+        }
+
+        function renderSpread(spreadIndex) {
+            const bookWrapper = document.getElementById('bookWrapper');
+            
+            // Remover todos los spreads activos
+            const allSpreads = bookWrapper.querySelectorAll('.book-spread');
+            allSpreads.forEach(spread => {
+                spread.classList.remove('active');
+                setTimeout(() => spread.remove(), 500);
+            });
+
+            // Crear nuevo spread
+            const spreadDiv = document.createElement('div');
+            spreadDiv.className = 'book-spread';
+            
+            spreads[spreadIndex].forEach(page => {
+                spreadDiv.appendChild(page.cloneNode(true));
+            });
+
+            bookWrapper.appendChild(spreadDiv);
+            
+            // Activar después de un pequeño delay para la transición
+            setTimeout(() => {
+                spreadDiv.classList.add('active');
+            }, 50);
+
+            // Actualizar contador de páginas
+            const firstPageNum = spreads[spreadIndex][0].dataset.page;
+            document.getElementById('currentPage').textContent = firstPageNum;
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentSpread === 0;
+            nextBtn.disabled = currentSpread === totalSpreads - 1;
+        }
+
+        function nextSpread() {
+            if (currentSpread < totalSpreads - 1) {
+                currentSpread++;
+                renderSpread(currentSpread);
+                updateNavigation();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function prevSpread() {
+            if (currentSpread > 0) {
+                currentSpread--;
+                renderSpread(currentSpread);
+                updateNavigation();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Event listeners
+        document.getElementById('prevBtn').addEventListener('click', prevSpread);
+        document.getElementById('nextBtn').addEventListener('click', nextSpread);
+
+        // Navegación por teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                prevSpread();
+            } else if (e.key === 'ArrowRight') {
+                nextSpread();
+            }
+        });
+
+        // Touch swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSpread();
+                } else {
+                    prevSpread();
+                }
+            }
+        }
+
+        // Reiniciar en cambio de tamaño de ventana
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const wasDesktop = isDesktop;
+                isDesktop = window.innerWidth > 1200;
+                
+                if (wasDesktop !== isDesktop) {
+                    currentSpread = 0;
+                    createSpreads();
+                    renderSpread(0);
+                    updateNavigation();
+                }
+            }, 250);
+        });
+
+        // Inicializar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
